@@ -26,4 +26,12 @@ export class LinksService {
       );
     }
   }
+
+  async findOriginalUrl(shortUrl: string): Promise<string | null> {
+    const link = await this.prisma.link.findUnique({
+      where: { shortUrl },
+    });
+    return link ? link.originalUrl : null;
+  }
+  
 }
