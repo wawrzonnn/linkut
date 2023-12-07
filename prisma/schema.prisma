@@ -23,4 +23,5 @@ model Link {
   originalUrl String
   userId      Int
   user        User   @relation(fields: [userId], references: [id])
+  expiresAt   DateTime
 }
