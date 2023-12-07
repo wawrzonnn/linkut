@@ -11,6 +11,9 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { Response } from 'express';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+
 
 @Controller('users')
 export class UsersController {
@@ -20,16 +23,13 @@ export class UsersController {
   ) {}
 
   @Post('register')
-  async register(
-    @Body('email') email: string,
-    @Body('password') password: string,
-  ) {
-    return this.usersService.createUser(email, password);
+  async register(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.createUser(createUserDto.email, createUserDto.password);
   }
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Request() req, @Res({ passthrough: true }) response: Response) {
+  async login(@Body() loginUserDto: LoginUserDto, @Request() req, @Res({ passthrough: true }) response: Response) {
     const jwt = await this.authService.login(req.user);
     response.cookie('jwt', jwt.access_token, { httpOnly: true });
     return req.user;
