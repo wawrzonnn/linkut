@@ -3,13 +3,24 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as shortid from 'shortid';
 import xss from 'xss';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class LinksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+    this.startCleanupJob();
+  }
+
+  private startCleanupJob() {
+    cron.schedule('0 0 * * *', async () => {
+      await this.removeExpiredLinks();
+    });
+  }
 
   async createLink(userId: number, originalUrl: string): Promise<any> {
     try {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 48);
       const cleanedUrl = xss(originalUrl);
       const shortUrl = shortid.generate();
       return await this.prisma.link.create({
@@ -17,6 +28,7 @@ export class LinksService {
           originalUrl: cleanedUrl,
           shortUrl,
           userId,
+          expiresAt,
         },
       });
     } catch (error) {
@@ -47,4 +59,16 @@ export class LinksService {
       throw new Error('Unable to retrieve user links');
     }
   }
+
+  private async removeExpiredLinks() {
+    const now = new Date();
+    await this.prisma.link.deleteMany({
+      where: {
+        expiresAt: {
+          lt: now
+        }
+      }
+    });
+  }
+
 }
