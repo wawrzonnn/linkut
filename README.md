@@ -54,3 +54,5 @@ $ npm run test:cov
 * User should be able to shorten passed URL
 * It should be able to manage shortened links
 * Security, and app monitoring should be implemented
+
+https://linkut.onrender.com

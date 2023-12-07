@@ -1,3 +1,4 @@
+# Etap budowy (build stage)
 FROM node:16-alpine as build
 
 WORKDIR /usr/src/app
@@ -8,10 +9,10 @@ RUN npm install
 
 COPY . .
 
-RUN apk add --no-cache python3 make g++
 RUN npm rebuild bcrypt --build-from-source
 RUN npm run build
 
+# Etap produkcyjny
 FROM node:16-alpine
 
 WORKDIR /usr/src/app
