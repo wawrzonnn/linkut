@@ -28,4 +28,10 @@ export class LinksController {
     res.redirect(301, originalUrl);
   }
   
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/mylinks')
+  async getUserLinks(@Req() req: any) {
+    const user = req.user;
+    return await this.linksService.findAllUserLinks(user.userId);
+  }
 }
