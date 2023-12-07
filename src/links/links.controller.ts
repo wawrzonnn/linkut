@@ -3,7 +3,7 @@ import { Controller, Post, Body, UseGuards, Req, Get, Param, NotFoundException, 
 import { AuthGuard } from '@nestjs/passport';
 import { LinksService } from './links.service';
 import { CreateLinkDto } from './dto/create-link.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @Controller('links')
 export class LinksController {
