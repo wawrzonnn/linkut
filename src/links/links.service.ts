@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import * as shortid from 'shortid';
 import xss from 'xss';
 import * as cron from 'node-cron';
+import { Link } from '@prisma/client';
 
 @Injectable()
 export class LinksService {
@@ -71,4 +72,28 @@ export class LinksService {
     });
   }
 
+  async recordClick(linkId: number, referrer: string): Promise<void> {
+    await this.prisma.linkStat.create({
+      data: {
+        linkId,
+        referrer
+      }
+    });
+  }
+  
+  async getLinkStats(linkId: number): Promise<any> {
+    return await this.prisma.linkStat.findMany({
+      where: { linkId },
+      select: {
+        clickedAt: true,
+        referrer: true
+      }
+    });
+  }
+
+  async findLinkByShortUrl(shortUrl: string): Promise<Link | null> {
+    return await this.prisma.link.findUnique({
+      where: { shortUrl },
+    });
+  }
 }
