@@ -5,10 +5,11 @@ import * as shortid from 'shortid';
 import xss from 'xss';
 import * as cron from 'node-cron';
 import { Link } from '@prisma/client';
+import { MyLogger } from 'src/logger.service';
 
 @Injectable()
 export class LinksService {
-  constructor(private prisma: PrismaService) {
+  constructor(private prisma: PrismaService, private logger: MyLogger) {
     this.startCleanupJob();
   }
 
@@ -24,6 +25,9 @@ export class LinksService {
       expiresAt.setHours(expiresAt.getHours() + 48);
       const cleanedUrl = xss(originalUrl);
       const shortUrl = shortid.generate();
+      this.logger.log(
+        `Creating new short URL for user ${userId}: ${cleanedUrl}`,
+      );
       return await this.prisma.link.create({
         data: {
           originalUrl: cleanedUrl,
@@ -33,6 +37,7 @@ export class LinksService {
         },
       });
     } catch (error) {
+      this.logger.error(`Error creating link: ${error.message}`);
       throw new HttpException(
         'Error creating link',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -66,9 +71,9 @@ export class LinksService {
     await this.prisma.link.deleteMany({
       where: {
         expiresAt: {
-          lt: now
-        }
-      }
+          lt: now,
+        },
+      },
     });
   }
 
@@ -76,18 +81,18 @@ export class LinksService {
     await this.prisma.linkStat.create({
       data: {
         linkId,
-        referrer
-      }
+        referrer,
+      },
     });
   }
-  
+
   async getLinkStats(linkId: number): Promise<any> {
     return await this.prisma.linkStat.findMany({
       where: { linkId },
       select: {
         clickedAt: true,
-        referrer: true
-      }
+        referrer: true,
+      },
     });
   }
 
