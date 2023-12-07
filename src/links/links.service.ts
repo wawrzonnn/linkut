@@ -33,5 +33,18 @@ export class LinksService {
     });
     return link ? link.originalUrl : null;
   }
-  
+
+  async findAllUserLinks(userId: number): Promise<any[]> {
+    try {
+      return await this.prisma.link.findMany({
+        where: { userId },
+        select: {
+          shortUrl: true,
+          originalUrl: true,
+        },
+      });
+    } catch (error) {
+      throw new Error('Unable to retrieve user links');
+    }
+  }
 }
