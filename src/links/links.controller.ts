@@ -18,14 +18,17 @@ export class LinksController {
   }
 
   @Get(':shortUrl')
-  async redirectToOriginal(@Param('shortUrl') shortUrl: string, @Res() res: Response) {
-    const originalUrl = await this.linksService.findOriginalUrl(shortUrl);
+  async redirectToOriginal(@Param('shortUrl') shortUrl: string, @Req() req: Request, @Res() res: Response) {
+    const link = await this.linksService.findLinkByShortUrl(shortUrl);
 
-    if (!originalUrl) {
+    if (!link) {
       throw new NotFoundException('Link not found');
     }
 
-    res.redirect(301, originalUrl);
+    const referrer = (req.headers as { referer?: string }).referer ?? 'direct';
+    await this.linksService.recordClick(link.id, referrer);
+
+    res.redirect(301, link.originalUrl);
   }
   
   @UseGuards(AuthGuard('jwt'))
@@ -34,4 +37,11 @@ export class LinksController {
     const user = req.user;
     return await this.linksService.findAllUserLinks(user.userId);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+@Get('stats/:linkId')
+async getLinkStats(@Param('linkId') linkId: number) {
+  return await this.linksService.getLinkStats(linkId);
+}
+
 }

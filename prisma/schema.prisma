@@ -24,4 +24,13 @@ model Link {
   userId      Int
   user        User   @relation(fields: [userId], references: [id])
   expiresAt   DateTime
+  linkStats  LinkStat[]
+}
+
+model LinkStat {
+  id        Int      @id @default(autoincrement())
+  linkId    Int
+  clickedAt DateTime @default(now())
+  referrer  String?
+  link      Link     @relation(fields: [linkId], references: [id])
 }
