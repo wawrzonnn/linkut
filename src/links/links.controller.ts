@@ -1,5 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Body, UseGuards, Req, Get, Param, NotFoundException, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Get,
+  Param,
+  NotFoundException,
+  Res,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LinksService } from './links.service';
 import { CreateLinkDto } from './dto/create-link.dto';
@@ -13,12 +23,19 @@ export class LinksController {
   @Post()
   async createLink(@Req() req: any, @Body() createLinkDto: CreateLinkDto) {
     const user = req.user;
-    const link = await this.linksService.createLink(user.userId, createLinkDto.originalUrl);
+    const link = await this.linksService.createLink(
+      user.userId,
+      createLinkDto.originalUrl,
+    );
     return link;
   }
 
   @Get(':shortUrl')
-  async redirectToOriginal(@Param('shortUrl') shortUrl: string, @Req() req: Request, @Res() res: Response) {
+  async redirectToOriginal(
+    @Param('shortUrl') shortUrl: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const link = await this.linksService.findLinkByShortUrl(shortUrl);
 
     if (!link) {
@@ -30,7 +47,7 @@ export class LinksController {
 
     res.redirect(301, link.originalUrl);
   }
-  
+
   @UseGuards(AuthGuard('jwt'))
   @Get('/mylinks')
   async getUserLinks(@Req() req: any) {
@@ -39,9 +56,8 @@ export class LinksController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-@Get('stats/:linkId')
-async getLinkStats(@Param('linkId') linkId: number) {
-  return await this.linksService.getLinkStats(linkId);
-}
-
+  @Get('stats/:linkId')
+  async getLinkStats(@Param('linkId') linkId: number) {
+    return await this.linksService.getLinkStats(linkId);
+  }
 }
