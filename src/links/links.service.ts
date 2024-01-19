@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as shortid from 'shortid';
-import xss from 'xss';
+const xss = require('xss');
 import * as cron from 'node-cron';
 import { Link } from '@prisma/client';
 import { MyLogger } from 'src/logger.service';
