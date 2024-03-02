@@ -1,4 +1,8 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {}
+const path = require('path');
 
-module.exports = nextConfig
+module.exports = {
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    config.resolve.alias['@'] = path.join(__dirname, 'src');
+    return config;
+  },
+};

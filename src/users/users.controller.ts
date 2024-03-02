@@ -39,23 +39,18 @@ export class UsersController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(
-    @Body() loginUserDto: LoginUserDto,
-    @Request() req,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async login(@Body() loginUserDto: LoginUserDto, @Request() req, @Res({ passthrough: true }) response: Response) {
     const jwt = await this.authService.login(req.user);
-    response.cookie('jwt', jwt.access_token, {
-      httpOnly: true,
-      path: '/',
-      secure: true,
-      sameSite: 'strict',
-    });
+    console.log(`Generated JWT for ${req.user.email}:`, jwt);
+  
+    response.cookie('jwt', jwt.access_token, { httpOnly: true, secure: false, path: '/' });
+  
     this.logger.log(`User ${req.user.email} logged in`);
-    this.logger.log(`JWT Cookie: ${jwt.access_token}`);
-
-    return { user: req.user, accessToken: jwt.access_token };
+    this.logger.log(`JWT Token -  ${jwt.access_token}`);
+  
+    return { access_token: jwt.access_token, message: 'Logged in successfully' };
   }
+  
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
@@ -66,3 +61,4 @@ export class UsersController {
     return this.usersService.findOneById(req.user.userId);
   }
 }
+

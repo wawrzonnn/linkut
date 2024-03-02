@@ -7,6 +7,7 @@ export const httpClient = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
 
       return handleResponse<ResponseData>(response);
