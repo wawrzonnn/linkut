@@ -10,5 +10,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [AuthModule],
   providers: [UsersService, PrismaService, MyLogger],
   controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}
